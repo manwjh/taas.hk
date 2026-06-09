@@ -1,106 +1,97 @@
 # OpenCode 使用指南
 
-本文说明如何将 **taas.hk** 令牌配置到 [OpenCode](https://opencode.ai)。
+[OpenCode](https://opencode.ai) 是**开源 Agent**，通过 [Provider](https://opencode.ai/docs/providers/) 对接模型。本文对应 [README §三](../README.md)：将 taas.hk 配置为 Provider 的具体步骤。
+
+**前置**：已在 taas.hk 创建令牌，见 [README · 创建令牌](../README.md#创建令牌)。
 
 ---
 
-## 前置条件
+## 1. Provider 机制
 
-1. 已在 [taas.hk](https://taas.hk) 创建令牌（pro 或 plus），详见 [README](../README.md#二如何创建令牌)
-2. 已安装 OpenCode CLI
+OpenCode 无厂商订阅登录。在配置中添加 Provider 即可对接：
 
-可选：[CC Switch 使用指南](./cc-switch.md)。
+- 厂商官方 API（OpenAI、Anthropic 等，经 `/connect` 录入凭据）
+- API 网关（如 taas.hk）
+
+配置层级（[Config](https://opencode.ai/docs/config/)）：
+
+| 范围 | 路径 |
+|------|------|
+| 全局 | `~/.config/opencode/opencode.json` |
+| 项目 | 项目根 `opencode.json`（优先级更高） |
+
+厂商 API 与网关的配置结构相同，仅 Base URL 与 API Key 不同。
 
 ---
 
-## 连接参数
+## 2. taas.hk Provider
 
-| 配置项 | 值 |
-|--------|-----|
-| API 地址 | `https://taas.hk/v1` |
-| API Key | 你的 `sk-...` 令牌 |
-| Provider 包 | `@ai-sdk/openai-compatible` |
-| 推荐模型 | `gpt-5.5`、`gpt-5.4` |
+### 连接参数
+
+| 项 | 值 |
+|----|-----|
+| Base URL | `https://taas.hk/v1` |
+| API Key | taas.hk 令牌 `sk-...` |
+| SDK 包 | `@ai-sdk/openai-compatible` |
 | 协议 | Chat Completions（`POST /v1/chat/completions`） |
 
-> OpenCode 通过 AI SDK 的 OpenAI 兼容 Provider 接入，走标准 Chat 接口，配置最简单，也适合用来验证令牌是否有效。
+若模型走 `/v1/responses`，应改用 `@ai-sdk/openai`（taas.hk 当前以 Chat 验证连通）。
 
----
+### 配置
 
-## 配置 OpenCode
+**方式 A：配置文件**
 
-编辑 OpenCode 配置文件，添加自定义 Provider：
+`~/.config/opencode/opencode.json`：
 
 ```json
 {
+  "$schema": "https://opencode.ai/config.json",
   "provider": {
-    "type": "npm",
-    "package": "@ai-sdk/openai-compatible",
-    "name": "taas.hk",
-    "options": {
-      "baseURL": "https://taas.hk/v1",
-      "apiKey": "sk-your-token",
-      "setCacheKey": true
-    },
-    "models": {
-      "gpt-5.5": { "name": "gpt-5.5" }
+    "taas": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "taas.hk",
+      "options": {
+        "baseURL": "https://taas.hk/v1",
+        "apiKey": "{env:TAAS_API_KEY}"
+      },
+      "models": {
+        "gpt-5.5": { "name": "gpt-5.5" }
+      }
     }
-  }
+  },
+  "model": "taas/gpt-5.5"
 }
 ```
 
-具体配置文件路径以你安装的 OpenCode 版本为准（通常在 `~/.config/opencode/` 或项目级配置）。
-
----
-
-## 验证配置
-
-### 检查模型列表
-
 ```bash
-curl -H "Authorization: Bearer sk-your-token" \
-  https://taas.hk/v1/models
+export TAAS_API_KEY=sk-your-token
 ```
 
-### Chat 对话测试
+**方式 B：TUI**
+
+1. 运行 `/connect`，选择或创建与配置 key 一致的 Provider ID（如 `taas`），录入 API Key
+2. 在 `opencode.json` 中补全 `provider`、`models`、`model`（`/connect` 仅存储凭据）
+3. `/models` 中应出现 `taas/gpt-5.5`
+
+修改配置后重启 OpenCode。
+
+### 验证
 
 ```bash
+curl -H "Authorization: Bearer sk-your-token" https://taas.hk/v1/models
+
 curl -X POST https://taas.hk/v1/chat/completions \
   -H "Authorization: Bearer sk-your-token" \
   -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-5.5",
-    "messages": [{"role": "user", "content": "hello"}]
-  }'
+  -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"hello"}]}'
 ```
 
-返回正常 JSON 即表示令牌和 Chat 链路可用。
+### CC Switch（可选）
 
-### 在 OpenCode 中测试
-
-启动 OpenCode 后发起一次简单任务，确认流式输出正常。
-
----
-
-## 常见问题
-
-**OpenCode 和 Codex 用同一个令牌吗？**
-
-可以。两者 API 地址都是 `https://taas.hk/v1`，区别仅在于协议（Chat vs Responses）。
-
-**支持哪些模型？**
-
-以 `GET /v1/models` 返回的 catalog 为准，常用：`gpt-5.5`、`gpt-5.4`、`deepseek-v4-pro`、`deepseek-v4-flash`。
-
-**需要配置代理吗？**
-
-国内网络访问境外 API 时，可在终端设置 `HTTP_PROXY` / `HTTPS_PROXY`，或在 OpenCode 启动环境中配置代理。
+OpenCode 槽位：Base URL `https://taas.hk/v1`，Provider 包 `@ai-sdk/openai-compatible`，模型 `gpt-5.5`。见 [cc-switch.md](./cc-switch.md)。
 
 ---
 
 ## 相关文档
 
-- [Codex 使用指南](./codex.md)
-- [Claude Code 使用指南](./claude-code.md)
-- [CC Switch 使用指南](./cc-switch.md)
-- [taas.hk 用户指南](../README.md)
+[cc-switch.md](./cc-switch.md) · [接入指南总览](../README.md)
