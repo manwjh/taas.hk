@@ -39,7 +39,7 @@ CLI 将 Base URL 与 `/v1/messages` 拼接（[LLM gateway](https://code.claude.c
 ```bash
 export ANTHROPIC_BASE_URL=https://taas.hk
 export ANTHROPIC_API_KEY=sk-your-token
-claude --model gpt-5.5
+claude --bare -p --model gpt-5.5
 ```
 
 或 `~/.claude/settings.json`（[Settings](https://code.claude.com/docs/en/settings)）：
@@ -67,7 +67,7 @@ curl -X POST https://taas.hk/v1/messages \
 
 ### CC Switch（可选）
 
-Claude 槽位 Base URL 填 `https://taas.hk`（不带 `/v1`），启用后运行 `claude --model gpt-5.5`。见 [cc-switch.md](./cc-switch.md)。
+Claude 槽位 Base URL 填 `https://taas.hk`（不带 `/v1`），启用后运行 `claude --bare -p --model gpt-5.5`。见 [cc-switch.md](./cc-switch.md)。
 
 ---
 

@@ -48,7 +48,7 @@
 | Base URL | `https://taas.hk`（不带 `/v1`） |
 | API Key | `sk-...` |
 
-运行 `claude --model gpt-5.5`。
+运行 `claude --bare -p --model gpt-5.5`。
 
 ### Claude Desktop
 
