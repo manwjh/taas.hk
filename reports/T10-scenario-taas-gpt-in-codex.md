@@ -62,6 +62,34 @@ wire_api = "responses"
 env_key = "OPENAI_API_KEY"
 ```
 
+配置 `OPENAI_API_KEY`。`env_key = "OPENAI_API_KEY"` 表示 Codex 会从该环境变量读取 API Key。
+
+macOS / Linux 临时配置：
+
+```bash
+export OPENAI_API_KEY=sk-xxx
+```
+
+Windows CMD 临时配置：
+
+```bat
+set OPENAI_API_KEY=sk-xxx
+```
+
+如果使用 Codex App / IDE，终端临时环境变量可能无法被读取，可按 `guides/codex.md` 写入：
+
+```env
+OPENAI_API_KEY=sk-xxx
+```
+
+到：
+
+```text
+~/.codex/.env
+```
+
+修改配置后，完全退出并重新打开 Codex。
+
 结果：
 
 - Codex 可识别 `taas` Provider。

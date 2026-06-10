@@ -20,7 +20,7 @@
 - 主机标识：`perfxlab@perfxlabdeMac-mini`
 - Agent：Claude Code CLI
 - Claude Code 版本：`2.1.169`
-- 配置方式：Shell 环境变量
+- 配置方式：临时环境变量
 - API Token：已打码，格式为 `sk-xxx`
 - 测试模型：`gpt-5.5`
 - 是否使用 CC Switch：否
@@ -64,6 +64,36 @@ sk-xxx
 验证结果：
 
 - Shell 环境变量 `ANTHROPIC_API_KEY` 已设置成功。
+
+### 临时配置推荐写法
+
+本次测试在 macOS 中使用 `export` 完成。`export` 只对当前终端会话及其子进程生效，不是系统永久配置。
+
+若文档目标是临时验证，建议优先使用“仅本次命令生效”的写法。
+
+macOS / Linux：
+
+```bash
+ANTHROPIC_BASE_URL=https://taas.hk \
+ANTHROPIC_API_KEY=sk-xxx \
+claude --bare -p --model gpt-5.5 "只回复 OK"
+```
+
+Windows PowerShell：
+
+```powershell
+& {
+  $env:ANTHROPIC_BASE_URL = "https://taas.hk"
+  $env:ANTHROPIC_API_KEY = "sk-xxx"
+  claude --bare -p --model gpt-5.5 "只回复 OK"
+}
+```
+
+Windows CMD：
+
+```bat
+set ANTHROPIC_BASE_URL=https://taas.hk && set ANTHROPIC_API_KEY=sk-xxx && claude --bare -p --model gpt-5.5 "只回复 OK"
+```
 
 ### 3. 检查 Claude Code 版本
 

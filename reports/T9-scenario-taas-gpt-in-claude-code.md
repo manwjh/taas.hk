@@ -50,17 +50,20 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 ### 2. 验证 Claude Code CLI 裸配置
 
-设置：
+临时配置并执行。
+
+macOS / Linux：
 
 ```bash
-export ANTHROPIC_BASE_URL=https://taas.hk
-export ANTHROPIC_API_KEY=sk-xxx
+ANTHROPIC_BASE_URL=https://taas.hk \
+ANTHROPIC_API_KEY=sk-xxx \
+claude --bare -p --model gpt-5.5 "只回复 OK"
 ```
 
-命令：
+Windows CMD：
 
-```bash
-claude --bare -p --model gpt-5.5 "只回复 OK"
+```bat
+set ANTHROPIC_BASE_URL=https://taas.hk && set ANTHROPIC_API_KEY=sk-xxx && claude --bare -p --model gpt-5.5 "只回复 OK"
 ```
 
 结果：
@@ -71,7 +74,7 @@ ok
 
 ### 3. Claude Code CLI 通过 CC Switch 配置
 
-通过 CC Switch 配置 Claude Code CLI：
+通过 CC Switch 配置 Claude Code CLI 的供应商：
 
 ```text
 Base URL: https://taas.hk
@@ -79,9 +82,17 @@ API Key: sk-xxx
 模型映射：Sonnet -> gpt-5.5
 ```
 
-结果：
+继续在 CC Switch 中打开路由：
 
-- Claude Code CLI 可通过 CC Switch 配置正常使用。
+```text
+设置 -> 路由 -> 本地路由
+```
+
+操作步骤：
+
+1. 打开路由总开关。
+2. 启动 Claude 路由。
+3. 保持 CC Switch 和 Claude 路由运行。
 
 ### 4. Claude Desktop 通过 CC Switch 模型映射
 
@@ -90,16 +101,9 @@ API Key: sk-xxx
 ```text
 Base URL: https://taas.hk
 API Key: sk-xxx
-模型映射：Sonnet -> gpt-5.5
+开启模型映射：Sonnet -> gpt-5.5
 ```
-
-结果：
-
-- Claude Desktop 模型映射可用。
-- 本地路由模式可用。
-- 所有 Claude Desktop 相关测试通过。
 
 ## 最终结论
 
 T9 场景测试通过。`taas.hk GPT -> Claude Code` 场景整体可用，包括 Claude Code CLI 裸配置、Claude Code CLI + CC Switch、Claude Desktop + CC Switch 模型映射。
-

@@ -55,10 +55,27 @@ env_key = "OPENAI_API_KEY"
 
 ### 2. 配置 API Key
 
-按文档设置环境变量：
+Codex 配置中的 `env_key = "OPENAI_API_KEY"` 表示 Codex 会从 `OPENAI_API_KEY` 读取 API Key。
+
+macOS / Linux 临时配置：
 
 ```bash
-export OPENAI_API_KEY=sk-xxx
+OPENAI_API_KEY=sk-xxx codex
+```
+
+Windows PowerShell 临时配置：
+
+```powershell
+& {
+  $env:OPENAI_API_KEY = "sk-xxx"
+  codex
+}
+```
+
+Windows CMD 临时配置：
+
+```bat
+set OPENAI_API_KEY=sk-xxx && codex
 ```
 
 如使用 Codex App / IDE，也可按文档写入：

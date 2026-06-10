@@ -40,14 +40,23 @@ macOS + Claude Code `2.1.169` 实测中，该命令仍连接 `api.anthropic.com`
 
 已验证可用命令为：
 
+macOS / Linux：
+
 ```bash
+ANTHROPIC_BASE_URL=https://taas.hk \
+ANTHROPIC_API_KEY=sk-xxx \
 claude --bare -p --model gpt-5.5 "只回复 OK"
 ```
 
-建议将 `guides/claude-code.md` 的 CLI 验证命令调整为上述形式，或增加说明：在需要强制使用 API key / 网关环境变量时，使用 `--bare -p` 进行验证。
+Windows PowerShell：
 
-## 剩余工作
+```powershell
+& {
+  $env:ANTHROPIC_BASE_URL = "https://taas.hk"
+  $env:ANTHROPIC_API_KEY = "sk-xxx"
+  claude --bare -p --model gpt-5.5 "只回复 OK"
+}
+```
 
-1. 根据 T4 结果修改 `guides/claude-code.md`。
-2. 根据 T9/T10 结果扩写两个 scenario 文档。
+建议将 `guides/claude-code.md` 的 CLI 验证命令调整为跨平台临时配置形式，或增加说明：在需要强制使用 API key / 网关环境变量时，使用 `--bare -p` 进行验证。
 
