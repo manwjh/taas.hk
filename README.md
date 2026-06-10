@@ -22,38 +22,34 @@
 | **Codex** | App / CLI / IDE 扩展 | ChatGPT 订阅，或 [OpenAI Platform](https://platform.openai.com/) API key |
 | **Claude Code** | CLI / Desktop | Anthropic 订阅，或 [Console](https://console.anthropic.com/) API key |
 
-共用配置文件：Codex → `~/.codex/config.toml`；Claude CLI → `~/.claude/settings.json`。Desktop 默认 **1P** 模式，推理走 Anthropic 官方基础设施。
-
 详见 [codex.md §1](./guides/codex.md#1-官方配置)、[claude-code.md §1](./guides/claude-code.md#1-官方配置)。
 
 ---
 
-## 二、厂商 Agent · 网关接入
+## 二、厂商 Agent · 网关接入（手动配置）
 
 将推理指向 API 网关时，需配置 **Base URL**、**API Key**、**模型 id**，并匹配协议。
 
 | Agent | 协议 | 要点 |
 |-------|------|------|
-| **Codex** | [Responses](https://developers.openai.com/codex/config-advanced#custom-model-providers) | 自定义 `model_provider`，`wire_api = "responses"` |
-| **Claude Code（CLI）** | [Messages](https://code.claude.com/docs/en/llm-gateway) | `ANTHROPIC_BASE_URL` 填根域（不带 `/v1`） |
-| **Claude Desktop** | Messages | 切 [Cowork on 3P](https://claude.com/docs/cowork/3p/overview)；接 GPT 时需 [CC Switch](./guides/cc-switch.md) 模型映射 |
+| **Codex** | [Responses](https://developers.openai.com/codex/config-advanced#custom-model-providers) | `model_provider` + `wire_api = "responses"` |
+| **Claude Code（CLI）** | [Messages](https://code.claude.com/docs/en/llm-gateway) | `ANTHROPIC_BASE_URL` 根域，不带 `/v1` |
+| **Claude Desktop** | Messages | [Cowork on 3P](https://claude.com/docs/cowork/3p/overview) + Gateway |
 
-操作步骤：[codex.md](./guides/codex.md) · [claude-code.md](./guides/claude-code.md) · [scenario-01](./guides/scenario-01-taas-gpt-in-claude-code.md) · [scenario-02](./guides/scenario-02-taas-gpt-in-codex.md)
-
-配置可手改文件，或用 [CC Switch](./guides/cc-switch.md) 管理多套预设（可选）。
+操作步骤：[codex.md §2 直接配置 / §3 CC Switch](./guides/codex.md#2-taashk-网关接入--直接配置) · [claude-code.md](./guides/claude-code.md) · [scenario-01](./guides/scenario-01-taas-gpt-in-claude-code.md) · [scenario-02](./guides/scenario-02-taas-gpt-in-codex.md)
 
 ---
 
-## 三、开源 Agent · Provider 配置
+## 三、开源 Agent · Provider 配置（手动配置）
 
-在 `opencode.json` 或 `openclaw.json` 中添加 Provider，填写 Base URL、API Key、模型即可。OpenAI 官方、Anthropic 官方与 taas.hk 等网关，均为 Provider 的一种来源。
+在 `opencode.json` 或 `openclaw.json` 中添加 Provider，填写 Base URL、API Key、模型即可。
 
 | Agent | 协议 | 配置文件 |
 |-------|------|----------|
 | **OpenCode** | Chat Completions | `~/.config/opencode/opencode.json` |
 | **OpenClaw** | 按 Provider | `~/.openclaw/openclaw.json` |
 
-详见 [opencode.md](./guides/opencode.md)、[CC Switch · OpenClaw](./guides/cc-switch.md#openclaw)。
+详见 [opencode.md](./guides/opencode.md)。
 
 ---
 
@@ -81,7 +77,7 @@ curl -X POST https://taas.hk/v1/chat/completions \
 |-------|----------|------|
 | Codex | `https://taas.hk/v1` | `wire_api = "responses"` |
 | Claude Code（CLI） | `https://taas.hk` | 不带 `/v1` |
-| Claude Desktop | `https://taas.hk` | 3P + 模型映射 |
+| Claude Desktop | `https://taas.hk` | 3P；GPT 模型另需 CC Switch 映射 |
 | OpenCode | `https://taas.hk/v1` | `@ai-sdk/openai-compatible` |
 | OpenClaw | 按 Provider 填写 | 见 CC Switch 槽位 |
 
@@ -89,14 +85,27 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 ---
 
-## 五、指南索引
+## 五、CC Switch 配置管理
+
+[CC Switch](https://github.com/farion1231/cc-switch) 是可选的图形化配置工具：保存多套供应商预设，切换时写入各 Agent 配置文件，**不替代**上文的手动配置路径。
+
+| 适用场景 | 说明 |
+|----------|------|
+| 多供应商切换 | 在 Codex / Claude / OpenCode / OpenClaw 槽位间一键切换 |
+| Claude Desktop + GPT | 模型角色映射与本地路由（手动配置无法覆盖） |
+
+各 Agent 槽位参数、切换步骤与常见问题，统一见 **[cc-switch.md](./guides/cc-switch.md)**。
+
+---
+
+## 六、指南索引
 
 | 文档 | 内容 |
 |------|------|
-| [codex.md](./guides/codex.md) | Codex 官方计费与 taas.hk 接入 |
-| [claude-code.md](./guides/claude-code.md) | Claude Code CLI / Desktop 接入 |
-| [opencode.md](./guides/opencode.md) | OpenCode Provider 配置 |
-| [cc-switch.md](./guides/cc-switch.md) | CC Switch 配置管理 |
+| [codex.md](./guides/codex.md) | Codex 直接配置与 CC Switch 配置 |
+| [claude-code.md](./guides/claude-code.md) | Claude Code 手动配置 |
+| [opencode.md](./guides/opencode.md) | OpenCode 手动配置 |
+| [cc-switch.md](./guides/cc-switch.md) | CC Switch 统一配置 |
 
 ---
 
@@ -104,8 +113,14 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 - 勿将 `sk-` 密钥提交到 Git 或公开分享
 - Codex 改配置后需完全退出（`Cmd+Q`）再打开；切换 `model_provider` 会改变侧边栏历史分组
+- Codex 使用过程中可能出现如下错误：
+  ```
+  Reconnecting... 1/5
+  unexpected status 503 Service Unavailable: No available channel for model gpt-5.4-mini under group plus (distributor) (request id: ...), url: https://taas.hk/v1/responses
+  ```
+  通常是因为 Agent 回退到了当前服务商不支持的模型（如 `gpt-5.4-mini`）。此时强制切回 `gpt-5.4` 或 `gpt-5.5` 即可恢复。
 - Claude CLI 与 Desktop 配置不互通
-- Claude Desktop 模型映射模式需保持 CC Switch 本地路由运行
+- Claude Desktop GPT 映射模式须保持 CC Switch 本地路由运行
 
 ---
 

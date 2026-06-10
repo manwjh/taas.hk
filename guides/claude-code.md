@@ -1,6 +1,6 @@
 # Claude Code 使用指南
 
-[Claude Code](https://code.claude.com/docs/en/overview) 是 Anthropic **厂商 Agent**。本文对应 [README §一、§二](../README.md)：官方计费说明，以及经 taas.hk 网关接入 CLI 与 Desktop 的步骤。
+[Claude Code](https://code.claude.com/docs/en/overview) 是 Anthropic **厂商 Agent**。本文说明官方配置与 taas.hk 网关的手动接入步骤。
 
 **前置**：已在 taas.hk 创建令牌，见 [README · 创建令牌](../README.md#创建令牌)。
 
@@ -77,22 +77,11 @@ Desktop 接网关须先切 **Cowork on 3P**（[概述](https://claude.com/docs/c
 
 1. Help → Troubleshooting → **Enable Developer Mode**
 2. Developer → **Configure third-party inference** → Connection 选 **Gateway**
+3. 填写 Gateway Base URL `https://taas.hk` 与 API Key，**Apply locally**，重启应用
 
-模型菜单仅展示 **Sonnet / Opus / Haiku** 角色名。接 `gpt-5.5` 等 GPT 模型时，须用 **CC Switch** 做角色映射并开启**本地路由**（[Claude Desktop 说明](https://github.com/farion1231/cc-switch/blob/main/docs/user-manual/zh/2-providers/2.6-claude-desktop.md)）。
+模型菜单仅展示 **Sonnet / Opus / Haiku** 角色名。若网关实际模型为 `gpt-5.5` 等 GPT id，菜单选项与上游模型不一致，需额外的**模型映射**与**本地路由**才能完成请求转发。
 
-| 步骤 | 操作 |
-|------|------|
-| 1 | CC Switch → **Claude Desktop** 面板（与 CLI 的 Claude 槽位分开） |
-| 2 | 添加 taas.hk：Base URL `https://taas.hk`，API Key 你的令牌 |
-| 3 | 开启**需要模型映射**，例如下表 |
-| 4 | 设置 → 路由 → 显示本地路由开关；Desktop 面板开启**本地路由** |
-| 5 | 完全退出并重启 Claude Desktop；映射模式须保持 CC Switch 运行 |
-
-| 模型角色 | 实际请求模型 |
-|----------|--------------|
-| Sonnet | `gpt-5.5` |
-
-映射模式下请求经 CC Switch 本地网关 `127.0.0.1:15721` 转发。CC Switch 会写入 Desktop 的 3P profile。
+上述映射配置不在 Claude Desktop 内完成，见 [CC Switch 使用指南 · Claude Desktop](./cc-switch.md#claude-desktop)。
 
 ---
 
@@ -101,11 +90,8 @@ Desktop 接网关须先切 **Cowork on 3P**（[概述](https://claude.com/docs/c
 **CLI 与 Desktop 配置互通吗？**  
 不互通，需分别配置。
 
-**Desktop 能否不用 CC Switch？**  
-3P Gateway 可手填 Base URL 与 API Key；但若菜单模型 id 与网关不一致（如 GPT），仍需模型映射能力，目前通过 CC Switch 实现。
-
 ---
 
 ## 相关文档
 
-[cc-switch.md](./cc-switch.md) · [接入指南总览](../README.md)
+[接入指南总览](../README.md)

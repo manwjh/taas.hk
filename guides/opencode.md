@@ -1,6 +1,6 @@
 # OpenCode 使用指南
 
-[OpenCode](https://opencode.ai) 是**开源 Agent**，通过 [Provider](https://opencode.ai/docs/providers/) 对接模型。本文对应 [README §三](../README.md)：将 taas.hk 配置为 Provider 的具体步骤。
+[OpenCode](https://opencode.ai) 是**开源 Agent**，通过 [Provider](https://opencode.ai/docs/providers/) 对接模型。本文说明 Provider 机制与 taas.hk 的手动配置步骤。
 
 **前置**：已在 taas.hk 创建令牌，见 [README · 创建令牌](../README.md#创建令牌)。
 
@@ -69,8 +69,8 @@ export TAAS_API_KEY=sk-your-token
 
 **方式 B：TUI**
 
-1. 运行 `/connect`，选择或创建与配置 key 一致的 Provider ID（如 `taas`），录入 API Key
-2. 在 `opencode.json` 中补全 `provider`、`models`、`model`（`/connect` 仅存储凭据）
+1. 运行 `/connect`，Provider ID 与配置 key 一致（如 `taas`），录入 API Key
+2. 在 `opencode.json` 中补全 `provider`、`models`、`model`
 3. `/models` 中应出现 `taas/gpt-5.5`
 
 修改配置后重启 OpenCode。
@@ -86,12 +86,8 @@ curl -X POST https://taas.hk/v1/chat/completions \
   -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"hello"}]}'
 ```
 
-### CC Switch（可选）
-
-OpenCode 槽位：Base URL `https://taas.hk/v1`，Provider 包 `@ai-sdk/openai-compatible`，模型 `gpt-5.5`。见 [cc-switch.md](./cc-switch.md)。
-
 ---
 
 ## 相关文档
 
-[cc-switch.md](./cc-switch.md) · [接入指南总览](../README.md)
+[接入指南总览](../README.md)
