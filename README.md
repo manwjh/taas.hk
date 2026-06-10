@@ -111,6 +111,8 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 ## 注意事项
 
+- taas.hk **不对外部个人开发者开放**；如需开户，请联系管理员 [manwjh@126.com](mailto:manwjh@126.com)。
+- 国内网络下，部分第三方 API 站点（含网关域名）可能因未完成 ICP 备案，被运营商 DNS 拦截或解析异常，表现为 `Could not resolve host`、连接超时等。可先将系统或路由器的 DNS 改为公共解析（如 `223.5.5.5`、`119.29.29.29`、`1.1.1.1`、`8.8.8.8`），再用 `nslookup taas.hk` 或 `curl` 验证；若公共 DNS 可解析而默认 DNS 不行，即为 DNS 问题。修改 DNS 后无需改 Agent 配置。
 - 勿将 `sk-` 密钥提交到 Git 或公开分享
 - Codex 改配置后需完全退出（`Cmd+Q`）再打开；切换 `model_provider` 会改变侧边栏历史分组
 - Codex 使用过程中可能出现如下错误：
