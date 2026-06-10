@@ -22,8 +22,8 @@
 | T6  | Claude Desktop 通过 CC Switch 模型映射测试 | PASS         | 环境 B / Windows | [T6-claude-desktop-cc-switch-mapping.md](./T6-claude-desktop-cc-switch-mapping.md) |
 | T7  | OpenCode 裸 Provider 配置测试           | PASS         | 环境 A / macOS   | [T7-opencode-direct-provider.md](./T7-opencode-direct-provider.md)                 |
 | T8  | OpenCode 通过 CC Switch 配置测试         | PASS         | 环境 B / Windows | [T8-opencode-cc-switch-config.md](./T8-opencode-cc-switch-config.md)               |
-| T9  | 场景 01：taas.hk GPT -> Claude Code   | PASS         | Windows        | [T9-scenario-taas-gpt-in-claude-code.md](./T9-scenario-taas-gpt-in-claude-code.md) |
-| T10 | 场景 02：taas.hk GPT -> Codex         | PASS         | Windows        | [T10-scenario-taas-gpt-in-codex.md](./T10-scenario-taas-gpt-in-codex.md)           |
+| T9  | 场景 01：taas.hk GPT -> Claude Code   | PASS         |                | [T9-scenario-taas-gpt-in-claude-code.md](./T9-scenario-taas-gpt-in-claude-code.md) |
+| T10 | 场景 02：taas.hk GPT -> Codex         | PASS         |                | [T10-scenario-taas-gpt-in-codex.md](./T10-scenario-taas-gpt-in-codex.md)           |
 
 
 ## 已发现需修改文档点
@@ -59,4 +59,3 @@ Windows PowerShell：
 ```
 
 建议将 `guides/claude-code.md` 的 CLI 验证命令调整为跨平台临时配置形式，或增加说明：在需要强制使用 API key / 网关环境变量时，使用 `--bare -p` 进行验证。
-
