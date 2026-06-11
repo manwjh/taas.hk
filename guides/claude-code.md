@@ -11,7 +11,7 @@
 | 入口 | 说明 |
 |------|------|
 | **CLI** | `claude` |
-| **Desktop** | Claude 桌面应用 **Code** 标签页 |
+| **Desktop** | Claude 桌面应用 **Code** 标签页（macOS / Windows） |
 
 | 计费 | 说明 |
 |------|------|
@@ -36,32 +36,72 @@ CLI 将 Base URL 与 `/v1/messages` 拼接（[LLM gateway](https://code.claude.c
 
 ### 配置
 
+写入 Claude Code 配置文件。以下命令可在任意目录运行，只需把 `sk-your-token` 替换为 taas.hk 令牌。
+
+**macOS（zsh / bash）**
+
 ```bash
-export ANTHROPIC_BASE_URL=https://taas.hk
-export ANTHROPIC_API_KEY=sk-your-token
-claude --bare -p --model gpt-5.5
-```
-
-或 `~/.claude/settings.json`（[Settings](https://code.claude.com/docs/en/settings)）：
-
-```json
+mkdir -p ~/.claude
+cat > ~/.claude/settings.json <<'EOF'
 {
   "env": {
     "ANTHROPIC_BASE_URL": "https://taas.hk",
     "ANTHROPIC_API_KEY": "sk-your-token"
   }
 }
+EOF
+```
+
+**Windows（PowerShell）**
+
+从开始菜单打开 **Windows PowerShell** 后运行（不是“命令提示符”cmd）。`USERPROFILE` 不用改，Windows 会自动指向当前用户目录。
+
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
+@'
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://taas.hk",
+    "ANTHROPIC_API_KEY": "sk-your-token"
+  }
+}
+'@ | Set-Content -Path "$env:USERPROFILE\.claude\settings.json" -Encoding UTF8
+```
+
+配置文件路径：
+
+| 环境 | 路径 |
+|------|------|
+| macOS | `~/.claude/settings.json` |
+| Windows | `%USERPROFILE%\.claude\settings.json` |
+
+配置后运行：
+
+```bash
+claude --bare -p --model gpt-5.5
 ```
 
 **模型选择**：id 须与 taas.hk catalog 一致。`CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` 可从网关拉取模型列表，但仅收录 `claude` / `anthropic` 前缀；**GPT 模型须用 `--model` 显式指定**（如 `gpt-5.5`）。
 
 ### 验证
 
+**macOS（zsh / bash）**
+
 ```bash
 curl -X POST https://taas.hk/v1/messages \
   -H "x-api-key: sk-your-token" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
+  -d '{"model":"gpt-5.5","max_tokens":64,"messages":[{"role":"user","content":"hello"}]}'
+```
+
+**Windows（PowerShell）**
+
+```powershell
+curl.exe -X POST https://taas.hk/v1/messages `
+  -H "x-api-key: sk-your-token" `
+  -H "anthropic-version: 2023-06-01" `
+  -H "Content-Type: application/json" `
   -d '{"model":"gpt-5.5","max_tokens":64,"messages":[{"role":"user","content":"hello"}]}'
 ```
 

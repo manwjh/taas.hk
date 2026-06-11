@@ -14,7 +14,12 @@
 | **CLI** | `codex` |
 | **IDE 扩展** | VS Code 等 |
 
-三者共用 `~/.codex/config.toml` 与登录缓存（[Authentication](https://developers.openai.com/codex/auth)）。
+三者共用 Codex 配置目录与登录缓存（[Authentication](https://developers.openai.com/codex/auth)）：
+
+| 环境 | 配置目录 | 配置文件 |
+|------|----------|----------|
+| macOS | `~/.codex` | `~/.codex/config.toml` |
+| Windows | `%USERPROFILE%\.codex` | `%USERPROFILE%\.codex\config.toml` |
 
 | 计费 | 说明 |
 |------|------|
@@ -40,30 +45,56 @@ Codex 使用 [Responses API](https://developers.openai.com/codex/config-advanced
 
 ### 配置
 
-编辑 `~/.codex/config.toml`：
+编辑配置文件：
+
+| 环境 | 路径 |
+|------|------|
+| macOS | `~/.codex/config.toml` |
+| Windows | `%USERPROFILE%\.codex\config.toml` |
 
 ```toml
 model_provider = "taas"
 model = "gpt-5.5"
+model_reasoning_effort = "high"
+disable_response_storage = true
 
 [model_providers.taas]
 name = "taas.hk"
 base_url = "https://taas.hk/v1"
 wire_api = "responses"
-env_key = "OPENAI_API_KEY"
+requires_openai_auth = true
 ```
 
-写入 API Key（二选一）：
+参数说明：
 
-| 入口 | 方式 |
+| 参数 | 说明 |
 |------|------|
-| **CLI** | 终端 `export OPENAI_API_KEY=sk-...`，或写入 `~/.codex/.env` |
-| **App / IDE** | 写入 `~/.codex/.env`（App 通常读不到终端 `export`，见 [Config basics](https://developers.openai.com/codex/config-basic)） |
+| `model_reasoning_effort = "high"` | 使用高推理强度 |
+| `disable_response_storage = true` | 不要求上游存储 Responses |
+| `requires_openai_auth = true` | 让 Codex 使用 OpenAI API key 认证流程，填入 taas.hk 令牌即可 |
 
-- **生效**：完全退出 Codex（macOS：`Cmd+Q`）后重新打开。
+不建议把 CC Switch 生成的 `approval_policy`、`sandbox_mode`、`marketplaces.*`、`desktop.*` 作为通用接入配置复制。它们分别属于本机执行权限、内置市场缓存、桌面端界面偏好，不是 taas.hk 网关连通所需参数。
+
+API Key 在首次打开 Codex 时录入。Codex 会把认证信息写入本机认证缓存，无需手动创建 `.env`。
+
+### 首次打开 Codex
+
+首次打开 Codex app 若出现登录页：
+
+| 按钮 | 适用场景 |
+|------|----------|
+| **Sign in with ChatGPT** | 使用 ChatGPT 订阅登录，走 OpenAI 官方服务 |
+| **Sign in another way** | 使用 API key / 自定义配置，适合 taas.hk 网关 |
+| **Sign up** | 注册新账号 |
+
+接 taas.hk 网关时选择 **Sign in another way**。随后出现 **OpenAI API key** 输入框时，填入同一个 taas.hk 令牌 `sk-...`。这里的 “OpenAI API key” 是 Codex 的通用字段名；实际请求地址和模型仍由 `config.toml` 中的 `base_url` 与 `model` 决定。不要使用 **Sign in with ChatGPT**，否则可能继续走 ChatGPT 订阅而不是 taas.hk。
+
+- **生效**：完全退出 Codex（macOS：`Cmd+Q`；Windows：退出窗口与托盘进程）后重新打开。
 - **切换来源**：若仍走 ChatGPT 订阅，在 Codex 中登出后再用上述配置启动。
 
 ### 验证
+
+**macOS（zsh / bash）**
 
 ```bash
 # 令牌与模型列表
@@ -79,11 +110,32 @@ curl -X POST https://taas.hk/v1/responses \
 codex
 ```
 
+**Windows（PowerShell）**
+
+```powershell
+# 令牌与模型列表
+curl.exe -H "Authorization: Bearer sk-your-token" https://taas.hk/v1/models
+
+# Responses 链路（Codex 实际使用的协议）
+curl.exe -X POST https://taas.hk/v1/responses `
+  -H "Authorization: Bearer sk-your-token" `
+  -H "Content-Type: application/json" `
+  -d '{"model":"gpt-5.5","input":"hello","store":false}'
+
+# 已安装 CLI 时
+codex
+```
+
 ---
 
 ## 3. taas.hk 网关接入 · CC Switch
 
-[CC Switch](https://github.com/farion1231/cc-switch) 将供应商预设写入 `~/.codex/config.toml` 与 `~/.codex/auth.json`，切换时自动覆盖，适合多套供应商来回切换。
+[CC Switch](https://github.com/farion1231/cc-switch) 将供应商预设写入 Codex 配置与认证文件，切换时自动覆盖，适合多套供应商来回切换。
+
+| 环境 | `config.toml` | `auth.json` |
+|------|---------------|-------------|
+| macOS | `~/.codex/config.toml` | `~/.codex/auth.json` |
+| Windows | `%USERPROFILE%\.codex\config.toml` | `%USERPROFILE%\.codex\auth.json` |
 
 ### 槽位参数
 
@@ -105,12 +157,12 @@ codex
 | 3 | 填写上表：Base URL、API Key、模型 `gpt-5.5`，Wire API 选 `responses` |
 | 4 | **不要**开启「需要本地路由」（taas.hk 原生支持 Responses，直连即可） |
 | 5 | 保存后在供应商卡片上点击 **启用** |
-| 6 | 完全退出 Codex（`Cmd+Q`）后重新打开 |
+| 6 | 完全退出 Codex（macOS：`Cmd+Q`；Windows：退出窗口与托盘进程）后重新打开 |
 
-CC Switch 启用后会写入：
+CC Switch 启用后会写入上表对应环境路径：
 
-- `~/.codex/auth.json` — `OPENAI_API_KEY`（**不是** `.env`）
-- `~/.codex/config.toml` — `model_provider`、`base_url`、`wire_api` 等
+- `auth.json` — `OPENAI_API_KEY`（**不是** `.env`）
+- `config.toml` — `model_provider`、`base_url`、`wire_api` 等
 
 切换供应商、托盘快捷切换等通用说明见 [cc-switch.md](./cc-switch.md)。
 
