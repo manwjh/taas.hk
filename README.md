@@ -36,7 +36,7 @@
 | **Claude Code（CLI）** | [Messages](https://code.claude.com/docs/en/llm-gateway) | `ANTHROPIC_BASE_URL` 根域，不带 `/v1` |
 | **Claude Desktop** | Messages | [Cowork on 3P](https://claude.com/docs/cowork/3p/overview) + Gateway |
 
-操作步骤：[codex.md §2 直接配置 / §3 CC Switch](./guides/codex.md#2-taashk-网关接入--直接配置) · [claude-code.md](./guides/claude-code.md) · [scenario-01](./guides/scenario-01-taas-gpt-in-claude-code.md) · [scenario-02](./guides/scenario-02-taas-gpt-in-codex.md)
+操作步骤：[guides 典型场景](./guides/README.md) · [codex.md §2 直接配置 / §3 CC Switch](./guides/codex.md#2-taashk-网关接入--直接配置) · [claude-code.md](./guides/claude-code.md)
 
 ---
 
@@ -99,6 +99,18 @@ curl -X POST https://taas.hk/v1/chat/completions \
 ---
 
 ## 六、指南索引
+
+### 典型用户场景（step by step）
+
+| 场景 | 文档 |
+|------|------|
+| Codex 直接配置接入 taas.hk | [scenario-01-codex-direct.md](./guides/scenario-01-codex-direct.md) |
+| CC Switch 配置 Codex 接入 taas.hk | [scenario-02-cc-switch-codex.md](./guides/scenario-02-cc-switch-codex.md) |
+| CC Switch 配置 Claude Desktop 接入 taas.hk | [scenario-03-cc-switch-claude-desktop.md](./guides/scenario-03-cc-switch-claude-desktop.md) |
+
+总览：[guides/README.md](./guides/README.md)
+
+### Agent 专篇
 
 | 文档 | 内容 |
 |------|------|
