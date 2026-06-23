@@ -140,4 +140,4 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 ## 相关链接
 
-- [taas.hk](https://taas.hk) · [CC Switch](https://github.com/farion1231/cc-switch)
+- [taas.hk](https://taas.hk) · [CC Switch](https://github.com/farion1231/cc-switch) · [参考资料（doc）](./doc/README.md)
