@@ -217,6 +217,10 @@ claude
 claude --model claude-sonnet-4.6
 ```
 
+配置成功时，终端应出现 Claude Code 欢迎界面，并能正常回复，例如：
+
+![Claude Code CLI 交互界面（Sonnet 4 · API Usage Billing）](./assets/claude-cli-interactive.png)
+
 ---
 
 **步骤汇总**
