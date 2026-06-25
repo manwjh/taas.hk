@@ -197,12 +197,6 @@ claude -p "Reply OK" --model claude-sonnet-4.6 < /dev/null
 claude -p "Reply OK" --model claude-opus-4.8 < /dev/null
 ```
 
-**GPT 模型**（如 `gpt-5.5`）须显式指定，且令牌须有权限：
-
-```bash
-claude -p "Reply OK" --model gpt-5.5 < /dev/null
-```
-
 ---
 
 ### 第 8 步：交互使用
