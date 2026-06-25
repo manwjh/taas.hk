@@ -24,19 +24,53 @@ CLI 与 Desktop 首次使用通常以 Anthropic 账号登录。Desktop 默认 **
 
 ## 2. taas.hk 网关接入 · CLI
 
-### 连接参数
+按以下 8 步完成配置与验证。全程**直连** taas.hk，不依赖 CC Switch。
+
+**连接参数（步骤 3 会用到）**
 
 | 项 | 值 |
 |----|-----|
 | Base URL | `https://taas.hk`（根域，**不带** `/v1`） |
 | API Key | `ANTHROPIC_API_KEY=sk-...` |
-| 协议 | Anthropic Messages（`POST /v1/messages`） |
+| 协议 | Anthropic Messages（CLI 自动拼接 `/v1/messages`） |
 
-CLI 将 Base URL 与 `/v1/messages` 拼接（[LLM gateway](https://code.claude.com/docs/en/llm-gateway)）。勿填 `https://taas.hk/v1`，否则路径重复。
+勿填 `https://taas.hk/v1`，否则路径会变成 `/v1/v1/messages`。
 
-### 配置
+---
 
-写入 Claude Code 配置文件。以下命令可在任意目录运行，只需把 `sk-your-token` 替换为 taas.hk 令牌。
+### 第 1 步：确认 Claude CLI 已安装
+
+```bash
+claude --version
+```
+
+期望看到版本号，例如 `2.1.x (Claude Code)`。
+
+---
+
+### 第 2 步：退出 CC Switch
+
+若 [CC Switch](./cc-switch.md) 在运行，先退出，避免覆盖 `~/.claude/settings.json`：
+
+**macOS**
+
+```bash
+osascript -e 'quit app "CC Switch"'
+```
+
+**Windows**：托盘右键 CC Switch → Exit。
+
+确认未运行：
+
+```bash
+pgrep -lf "cc-switch"    # macOS / Linux，无输出即正常
+```
+
+---
+
+### 第 3 步：写入配置
+
+把 `sk-your-token` 替换为 taas.hk 令牌。
 
 **macOS（zsh / bash）**
 
@@ -46,7 +80,11 @@ cat > ~/.claude/settings.json <<'EOF'
 {
   "env": {
     "ANTHROPIC_BASE_URL": "https://taas.hk",
-    "ANTHROPIC_API_KEY": "sk-your-token"
+    "ANTHROPIC_API_KEY": "sk-your-token",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4.6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4.8",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4.5",
+    "ANTHROPIC_MODEL": "claude-sonnet-4.6"
   }
 }
 EOF
@@ -54,15 +92,17 @@ EOF
 
 **Windows（PowerShell）**
 
-从开始菜单打开 **Windows PowerShell** 后运行（不是“命令提示符”cmd）。`USERPROFILE` 不用改，Windows 会自动指向当前用户目录。
-
 ```powershell
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
 @'
 {
   "env": {
     "ANTHROPIC_BASE_URL": "https://taas.hk",
-    "ANTHROPIC_API_KEY": "sk-your-token"
+    "ANTHROPIC_API_KEY": "sk-your-token",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4.6",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4.8",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4.5",
+    "ANTHROPIC_MODEL": "claude-sonnet-4.6"
   }
 }
 '@ | Set-Content -Path "$env:USERPROFILE\.claude\settings.json" -Encoding UTF8
@@ -75,15 +115,27 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude" | Out-Null
 | macOS | `~/.claude/settings.json` |
 | Windows | `%USERPROFILE%\.claude\settings.json` |
 
-配置后运行：
+**模型映射说明**：交互模式默认 Opus 时，CLI 内部 id 为 `claude-opus-4-8`，taas.hk 须用 `claude-opus-4.8`（点号）。缺少上述 `ANTHROPIC_DEFAULT_*_MODEL` 时，界面可能显示正常但请求报 `API error` 并不断重试。
+
+---
+
+### 第 4 步：检查配置文件
 
 ```bash
-claude --bare -p --model gpt-5.5
+cat ~/.claude/settings.json    # Windows: type %USERPROFILE%\.claude\settings.json
 ```
 
-**模型选择**：id 须与 taas.hk catalog 一致。`CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` 可从网关拉取模型列表，但仅收录 `claude` / `anthropic` 前缀；**GPT 模型须用 `--model` 显式指定**（如 `gpt-5.5`）。
+确认：
 
-### 验证
+- `ANTHROPIC_BASE_URL` 为 `https://taas.hk`
+- `ANTHROPIC_API_KEY` 为你的 `sk-...`
+- 文件**非空**（若为 0 字节，回到第 3 步重写，并确认 CC Switch 已退出）
+
+---
+
+### 第 5 步：curl 测网关
+
+`curl` **不会**读取 `settings.json`，命令里须写真实令牌。
 
 **macOS（zsh / bash）**
 
@@ -92,7 +144,7 @@ curl -X POST https://taas.hk/v1/messages \
   -H "x-api-key: sk-your-token" \
   -H "anthropic-version: 2023-06-01" \
   -H "Content-Type: application/json" \
-  -d '{"model":"gpt-5.5","max_tokens":64,"messages":[{"role":"user","content":"hello"}]}'
+  -d '{"model":"claude-sonnet-4.6","max_tokens":32,"messages":[{"role":"user","content":"hello"}]}'
 ```
 
 **Windows（PowerShell）**
@@ -102,12 +154,85 @@ curl.exe -X POST https://taas.hk/v1/messages `
   -H "x-api-key: sk-your-token" `
   -H "anthropic-version: 2023-06-01" `
   -H "Content-Type: application/json" `
-  -d '{"model":"gpt-5.5","max_tokens":64,"messages":[{"role":"user","content":"hello"}]}'
+  -d '{"model":"claude-sonnet-4.6","max_tokens":32,"messages":[{"role":"user","content":"hello"}]}'
 ```
 
-### CC Switch（可选）
+期望：返回 JSON，`content[0].text` 有正常回复。
 
-Claude 槽位 Base URL 填 `https://taas.hk`（不带 `/v1`），启用后运行 `claude --bare -p --model gpt-5.5`。见 [cc-switch.md](./cc-switch.md)。
+可选：查可用模型列表
+
+```bash
+curl -H "Authorization: Bearer sk-your-token" https://taas.hk/v1/models
+```
+
+---
+
+### 第 6 步：检查 Claude CLI 登录状态
+
+```bash
+claude auth status
+```
+
+期望：
+
+```json
+"loggedIn": true
+```
+
+若为 `false`，回到第 4 步检查配置。
+
+---
+
+### 第 7 步：验证 Claude CLI 调用
+
+```bash
+claude -p "Reply OK" --model claude-sonnet-4.6 < /dev/null
+```
+
+期望：终端输出 `OK`。
+
+可选：测 Opus
+
+```bash
+claude -p "Reply OK" --model claude-opus-4.8 < /dev/null
+```
+
+**GPT 模型**（如 `gpt-5.5`）须显式指定，且令牌须有权限：
+
+```bash
+claude -p "Reply OK" --model gpt-5.5 < /dev/null
+```
+
+---
+
+### 第 8 步：交互使用
+
+```bash
+claude
+```
+
+进入后发消息测试。若界面显示 Opus 且仍报 `API error`，指定 Sonnet 启动：
+
+```bash
+claude --model claude-sonnet-4.6
+```
+
+---
+
+**步骤汇总**
+
+| 步骤 | 操作 | 通过标准 |
+|------|------|----------|
+| 1 | `claude --version` | 有版本号 |
+| 2 | 退出 CC Switch | 未运行 |
+| 3 | 写 `settings.json` | 含 Base URL、Key、模型映射 |
+| 4 | `cat settings.json` | 内容正确、非空 |
+| 5 | `curl` 测网关 | JSON 有回复 |
+| 6 | `claude auth status` | `loggedIn: true` |
+| 7 | `claude -p ...` | 输出 `OK` |
+| 8 | `claude` | 可正常对话 |
+
+**CC Switch（可选）**：若用 CC Switch 管理 Claude 槽位，见 [cc-switch.md](./cc-switch.md)。与本文直连配置二选一即可；同时启用时 CC Switch 可能改写 `settings.json`。
 
 ---
 
