@@ -20,6 +20,22 @@
 
 CLI 与 Desktop 首次使用通常以 Anthropic 账号登录。Desktop 默认 **1P** 模式，推理走 Anthropic 官方基础设施，无需改 Base URL。
 
+### 下载 Claude Desktop（离线安装包）
+
+Claude **Code** 运行在 Claude Desktop 应用的 **Code** 标签页中。若访问 Anthropic 下载站较慢，可从本仓库 **Releases** 下载与 [Anthropic 官方离线通道](https://downloads.claude.ai/releases-offline/) 同步的安装包。均为完整离线包，**安装过程无需再联网下载组件**（首次登录与调用模型仍需要网络）。
+
+| 平台 | 文件 |
+|------|------|
+| macOS · Apple Silicon | `Claude-offline-darwin-arm64-*.dmg` |
+| macOS · Intel | `Claude-offline-darwin-x64-*.dmg` |
+| Windows · x64 | `Claude-offline-win32-x64-*.msix` |
+| Windows · ARM64 | `Claude-offline-win32-arm64-*.msix` |
+
+- **Releases 列表**：[github.com/manwjh/taas.hk/releases?q=claude-code-desktop](https://github.com/manwjh/taas.hk/releases?q=claude-code-desktop)
+- **当前版本索引**：[downloads/claude-code/desktop.json](../downloads/claude-code/desktop.json)（含各平台直链，由 GitHub Actions 自动更新）
+
+> Windows 官方离线包为 `.msix` 格式（非 `.exe`），支持 Cowork / Code 完整功能。详见 [Claude Desktop 安装文档](https://claude.com/docs/third-party/claude-desktop/installation)。
+
 ---
 
 ## 2. taas.hk 网关接入 · CLI

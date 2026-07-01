@@ -1,0 +1,182 @@
+name: Sync Claude Code Desktop
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 每天 07:00 UTC 检查 Anthropic 官方离线 Desktop 安装包
+    - cron: "0 7 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-claude-code-desktop
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_REPO: ${{ github.repository }}
+      UPSTREAM_BASE: https://downloads.claude.ai/releases-offline
+    steps:
+      - name: Resolve upstream release
+        id: upstream
+        run: |
+          set -euo pipefail
+
+          platforms=(
+            "darwin/arm64|macOS (Apple Silicon)"
+            "darwin/x64|macOS (Intel)"
+            "win32/x64|Windows (x64)"
+            "win32/arm64|Windows (ARM64)"
+          )
+
+          version=""
+          assets_json="[]"
+
+          for entry in "${platforms[@]}"; do
+            path="${entry%%|*}"
+            label="${entry#*|}"
+            meta="$(curl -fsSL "${UPSTREAM_BASE}/${path}/latest.json")"
+            item_version="$(echo "$meta" | jq -r '.version')"
+            filename="$(echo "$meta" | jq -r '.filename')"
+            url="$(echo "$meta" | jq -r '.url')"
+
+            if [ -z "$version" ]; then
+              version="$item_version"
+            elif [ "$version" != "$item_version" ]; then
+              echo "Version mismatch for ${path}: expected ${version}, got ${item_version}" >&2
+              exit 1
+            fi
+
+            assets_json="$(echo "$assets_json" | jq \
+              --arg platform "$label" \
+              --arg path "$path" \
+              --arg file "$filename" \
+              --arg url "$url" \
+              '. + [{platform: $platform, path: $path, file: $file, url: $url}]')"
+          done
+
+          release_tag="claude-code-desktop-v${version}"
+
+          jq -n \
+            --arg version "$version" \
+            --arg release_tag "$release_tag" \
+            --arg upstream_base "$UPSTREAM_BASE" \
+            --arg synced_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --argjson assets "$assets_json" \
+            '{
+              product: "claude-code-desktop",
+              upstream_base: $upstream_base,
+              version: $version,
+              release_tag: $release_tag,
+              synced_at: $synced_at,
+              offline_installer: true,
+              assets: $assets
+            }' > /tmp/claude-upstream.json
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+
+          if gh release view "$release_tag" >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Release ${release_tag} already exists; nothing to do."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download Claude Desktop offline installers
+        if: steps.upstream.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/claude-code-desktop
+
+          jq -c '.assets[]' /tmp/claude-upstream.json | while read -r asset; do
+            file="$(echo "$asset" | jq -r '.file')"
+            url="$(echo "$asset" | jq -r '.url')"
+            echo "Downloading ${file} ..."
+            curl -fL --retry 3 --retry-delay 10 -o "/tmp/claude-code-desktop/${file}" "$url"
+          done
+
+      - name: Publish GitHub Release
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.upstream.outputs.version }}
+          RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          notes_file="/tmp/claude-code-desktop/release-notes.md"
+          cat > "$notes_file" <<EOF
+          Claude Desktop（含 **Code** 标签页）离线安装包镜像。
+
+          来源：[Anthropic 官方离线发布通道](https://downloads.claude.ai/releases-offline/)（版本 ${VERSION}）。
+
+          均为完整离线安装包，安装时**无需再联网下载组件**。
+
+          | 平台 | 文件 |
+          |------|------|
+          | macOS · Apple Silicon | \`Claude-offline-darwin-arm64-${VERSION}.dmg\` |
+          | macOS · Intel | \`Claude-offline-darwin-x64-${VERSION}.dmg\` |
+          | Windows · x64 | \`Claude-offline-win32-x64-${VERSION}.msix\` |
+          | Windows · ARM64 | \`Claude-offline-win32-arm64-${VERSION}.msix\` |
+
+          > Windows 官方离线包为 \`.msix\` 格式（支持 Cowork / Code 完整功能）。详见 [Claude Desktop 安装文档](https://claude.com/docs/third-party/claude-desktop/installation)。
+          EOF
+
+          mapfile -t files < <(jq -r '.assets[].file' /tmp/claude-upstream.json | sed 's#^#/tmp/claude-code-desktop/#')
+
+          gh release create "$RELEASE_TAG" \
+            --title "Claude Code Desktop ${VERSION}" \
+            --notes-file "$notes_file" \
+            "${files[@]}"
+
+      - name: Update desktop manifest
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          manifest_path="downloads/claude-code/desktop.json"
+          release_url="https://github.com/${REPO}/releases/tag/${RELEASE_TAG}"
+
+          jq \
+            --arg release_url "$release_url" \
+            --arg synced_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --arg repo "$REPO" \
+            --arg release_tag "$RELEASE_TAG" \
+            '
+              .release_url = $release_url
+              | .synced_at = $synced_at
+              | .assets = [
+                  .assets[]
+                  | {
+                      platform: .platform,
+                      file: .file,
+                      upstream_url: .url,
+                      url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/" + .file)
+                    }
+                ]
+            ' /tmp/claude-upstream.json > /tmp/desktop.json
+
+          commit_message="chore: sync Claude Code Desktop manifest for v$(jq -r .version /tmp/desktop.json)"
+          content="$(base64 -w0 /tmp/desktop.json)"
+          existing_sha="$(gh api "repos/${REPO}/contents/${manifest_path}" --jq .sha 2>/dev/null || true)"
+
+          api_args=(
+            --method PUT
+            "repos/${REPO}/contents/${manifest_path}"
+            -f message="$commit_message"
+            -f content="$content"
+          )
+          if [ -n "$existing_sha" ]; then
+            api_args+=(-f sha="$existing_sha")
+          fi
+
+          gh api "${api_args[@]}"

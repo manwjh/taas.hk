@@ -1,0 +1,11 @@
+{
+  "product": "claude-code-desktop",
+  "upstream_base": "https://downloads.claude.ai/releases-offline",
+  "version": null,
+  "release_tag": null,
+  "release_url": "https://github.com/manwjh/taas.hk/releases?q=claude-code-desktop",
+  "upstream_published_at": null,
+  "synced_at": null,
+  "offline_installer": true,
+  "assets": []
+}
