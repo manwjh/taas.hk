@@ -17,8 +17,6 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-
       - name: Resolve upstream release
         id: upstream
         env:
@@ -121,6 +119,7 @@ jobs:
       - name: Update desktop manifest
         if: steps.upstream.outputs.skip != 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
           UPSTREAM_TAG: ${{ steps.upstream.outputs.upstream_tag }}
           UPSTREAM_VERSION: ${{ steps.upstream.outputs.upstream_version }}
           RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
@@ -129,7 +128,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          manifest_path="downloads/codex/desktop.json"
           release_url="https://github.com/${REPO}/releases/tag/${RELEASE_TAG}"
+
           jq -n \
             --arg upstream_tag "$UPSTREAM_TAG" \
             --arg version "$UPSTREAM_VERSION" \
@@ -170,10 +171,20 @@ jobs:
                   url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/codex-aarch64-pc-windows-msvc.exe")
                 }
               ]
-            }' > downloads/codex/desktop.json
+            }' > /tmp/desktop.json
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add downloads/codex/desktop.json
-          git commit -m "chore: sync Codex Desktop manifest for ${UPSTREAM_TAG}"
-          git push
+          commit_message="chore: sync Codex Desktop manifest for ${UPSTREAM_TAG}"
+          content="$(base64 -w0 /tmp/desktop.json)"
+          existing_sha="$(gh api "repos/${REPO}/contents/${manifest_path}" --jq .sha 2>/dev/null || true)"
+
+          api_args=(
+            --method PUT
+            "repos/${REPO}/contents/${manifest_path}"
+            -f message="$commit_message"
+            -f content="$content"
+          )
+          if [ -n "$existing_sha" ]; then
+            api_args+=(-f sha="$existing_sha")
+          fi
+
+          gh api "${api_args[@]}"
