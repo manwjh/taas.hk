@@ -16,6 +16,8 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      GH_REPO: ${{ github.repository }}
     steps:
       - name: Resolve upstream release
         id: upstream
