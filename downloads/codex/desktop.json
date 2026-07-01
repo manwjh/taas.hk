@@ -1,12 +1,33 @@
 {
   "product": "codex-desktop",
   "upstream_repo": "openai/codex",
-  "upstream_tag": null,
-  "version": null,
-  "release_tag": null,
-  "release_url": "https://github.com/manwjh/taas.hk/releases?q=codex-desktop",
-  "upstream_published_at": null,
-  "synced_at": null,
+  "upstream_tag": "rust-v0.142.5",
+  "version": "0.142.5",
+  "release_tag": "codex-desktop-rust-v0.142.5",
+  "release_url": "https://github.com/manwjh/taas.hk/releases/tag/codex-desktop-rust-v0.142.5",
+  "upstream_published_at": "2026-07-01T01:15:44Z",
+  "synced_at": "2026-07-01T08:22:37Z",
   "offline_installer": true,
-  "assets": []
+  "assets": [
+    {
+      "platform": "macOS (Apple Silicon)",
+      "file": "codex-aarch64-apple-darwin.dmg",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/codex-desktop-rust-v0.142.5/codex-aarch64-apple-darwin.dmg"
+    },
+    {
+      "platform": "macOS (Intel)",
+      "file": "codex-x86_64-apple-darwin.dmg",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/codex-desktop-rust-v0.142.5/codex-x86_64-apple-darwin.dmg"
+    },
+    {
+      "platform": "Windows (x64)",
+      "file": "codex-x86_64-pc-windows-msvc.exe",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/codex-desktop-rust-v0.142.5/codex-x86_64-pc-windows-msvc.exe"
+    },
+    {
+      "platform": "Windows (ARM64)",
+      "file": "codex-aarch64-pc-windows-msvc.exe",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/codex-desktop-rust-v0.142.5/codex-aarch64-pc-windows-msvc.exe"
+    }
+  ]
 }
