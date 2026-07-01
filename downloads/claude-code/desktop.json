@@ -1,11 +1,35 @@
 {
   "product": "claude-code-desktop",
   "upstream_base": "https://downloads.claude.ai/releases-offline",
-  "version": null,
-  "release_tag": null,
-  "release_url": "https://github.com/manwjh/taas.hk/releases?q=claude-code-desktop",
-  "upstream_published_at": null,
-  "synced_at": null,
+  "version": "1.17377.1",
+  "release_tag": "claude-code-desktop-v1.17377.1",
+  "synced_at": "2026-07-01T08:37:53Z",
   "offline_installer": true,
-  "assets": []
+  "assets": [
+    {
+      "platform": "macOS (Apple Silicon)",
+      "file": "Claude-offline-darwin-arm64-1.17377.1.dmg",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/darwin/arm64/1.17377.1/Claude-2b3ab429b13f2c904d7552b7ca82a0d2a22af52f-offline.dmg",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-v1.17377.1/Claude-offline-darwin-arm64-1.17377.1.dmg"
+    },
+    {
+      "platform": "macOS (Intel)",
+      "file": "Claude-offline-darwin-x64-1.17377.1.dmg",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/darwin/x64/1.17377.1/Claude-2b3ab429b13f2c904d7552b7ca82a0d2a22af52f-offline.dmg",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-v1.17377.1/Claude-offline-darwin-x64-1.17377.1.dmg"
+    },
+    {
+      "platform": "Windows (x64)",
+      "file": "Claude-offline-win32-x64-1.17377.1.msix",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/win32/x64/1.17377.1/Claude-2b3ab429b13f2c904d7552b7ca82a0d2a22af52f-offline.msix",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-v1.17377.1/Claude-offline-win32-x64-1.17377.1.msix"
+    },
+    {
+      "platform": "Windows (ARM64)",
+      "file": "Claude-offline-win32-arm64-1.17377.1.msix",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/win32/arm64/1.17377.1/Claude-2b3ab429b13f2c904d7552b7ca82a0d2a22af52f-offline.msix",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-v1.17377.1/Claude-offline-win32-arm64-1.17377.1.msix"
+    }
+  ],
+  "release_url": "https://github.com/manwjh/taas.hk/releases/tag/claude-code-desktop-v1.17377.1"
 }
