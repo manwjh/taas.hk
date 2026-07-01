@@ -28,6 +28,22 @@
 
 CLI 无有效会话时，默认引导 ChatGPT 登录。此路径下无需改 Base URL。
 
+### 下载 Codex Desktop（离线安装包）
+
+若访问 GitHub 较慢，可从本仓库 **Releases** 下载与 [openai/codex](https://github.com/openai/codex/releases) 同步的 **Codex Desktop 独立安装包**。均为完整 `.dmg` / `.exe`，**安装过程无需再联网下载组件**（首次登录与调用模型仍需要网络）。
+
+| 平台 | 文件 |
+|------|------|
+| macOS · Apple Silicon | `codex-aarch64-apple-darwin.dmg` |
+| macOS · Intel | `codex-x86_64-apple-darwin.dmg` |
+| Windows · x64 | `codex-x86_64-pc-windows-msvc.exe` |
+| Windows · ARM64 | `codex-aarch64-pc-windows-msvc.exe` |
+
+- **Releases 列表**：[github.com/manwjh/taas.hk/releases?q=codex-desktop](https://github.com/manwjh/taas.hk/releases?q=codex-desktop)
+- **当前版本索引**：[downloads/codex/desktop.json](../downloads/codex/desktop.json)（含各平台直链，由 GitHub Actions 自动更新）
+
+> 本镜像仅同步 **Desktop App**，不含 CLI 在线安装脚本（`install.sh` / `install.ps1`）。CLI 请仍使用官方渠道安装。
+
 ---
 
 ## 2. taas.hk 网关接入 · 直接配置

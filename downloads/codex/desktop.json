@@ -1,0 +1,12 @@
+{
+  "product": "codex-desktop",
+  "upstream_repo": "openai/codex",
+  "upstream_tag": null,
+  "version": null,
+  "release_tag": null,
+  "release_url": "https://github.com/manwjh/taas.hk/releases?q=codex-desktop",
+  "upstream_published_at": null,
+  "synced_at": null,
+  "offline_installer": true,
+  "assets": []
+}

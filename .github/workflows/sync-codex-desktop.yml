@@ -1,0 +1,179 @@
+name: Sync Codex Desktop
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 每天 06:00 UTC 检查 openai/codex 是否有新 Desktop 安装包
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-codex-desktop
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve upstream release
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          release_json="$(gh api repos/openai/codex/releases/latest)"
+          upstream_tag="$(echo "$release_json" | jq -r '.tag_name')"
+          upstream_version="${upstream_tag#rust-v}"
+          release_tag="codex-desktop-${upstream_tag}"
+
+          echo "upstream_tag=$upstream_tag" >> "$GITHUB_OUTPUT"
+          echo "upstream_version=$upstream_version" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "published_at=$(echo "$release_json" | jq -r '.published_at')" >> "$GITHUB_OUTPUT"
+
+          asset_names=(
+            "codex-aarch64-apple-darwin.dmg"
+            "codex-x86_64-apple-darwin.dmg"
+            "codex-x86_64-pc-windows-msvc.exe"
+            "codex-aarch64-pc-windows-msvc.exe"
+          )
+
+          missing=()
+          for name in "${asset_names[@]}"; do
+            if ! echo "$release_json" | jq -e --arg n "$name" '.assets[] | select(.name == $n)' >/dev/null; then
+              missing+=("$name")
+            fi
+          done
+
+          if ((${#missing[@]} > 0)); then
+            echo "Missing desktop assets in ${upstream_tag}: ${missing[*]}" >&2
+            exit 1
+          fi
+
+          if gh release view "$release_tag" >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Release ${release_tag} already exists; nothing to do."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download Codex Desktop installers
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.upstream_tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/codex-desktop
+
+          assets=(
+            "codex-aarch64-apple-darwin.dmg"
+            "codex-x86_64-apple-darwin.dmg"
+            "codex-x86_64-pc-windows-msvc.exe"
+            "codex-aarch64-pc-windows-msvc.exe"
+          )
+
+          for asset in "${assets[@]}"; do
+            url="https://github.com/openai/codex/releases/download/${UPSTREAM_TAG}/${asset}"
+            echo "Downloading ${asset} ..."
+            curl -fL --retry 3 --retry-delay 5 -o "/tmp/codex-desktop/${asset}" "$url"
+          done
+
+      - name: Publish GitHub Release
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.upstream_tag }}
+          UPSTREAM_VERSION: ${{ steps.upstream.outputs.upstream_version }}
+          RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
+          PUBLISHED_AT: ${{ steps.upstream.outputs.published_at }}
+        run: |
+          set -euo pipefail
+
+          notes_file="/tmp/codex-desktop/release-notes.md"
+          cat > "$notes_file" <<EOF
+          Codex Desktop 独立安装包镜像（来源：[openai/codex ${UPSTREAM_TAG}](https://github.com/openai/codex/releases/tag/${UPSTREAM_TAG})）。
+
+          均为完整离线安装包，安装时**无需再联网下载**组件。
+
+          | 平台 | 文件 |
+          |------|------|
+          | macOS · Apple Silicon | \`codex-aarch64-apple-darwin.dmg\` |
+          | macOS · Intel | \`codex-x86_64-apple-darwin.dmg\` |
+          | Windows · x64 | \`codex-x86_64-pc-windows-msvc.exe\` |
+          | Windows · ARM64 | \`codex-aarch64-pc-windows-msvc.exe\` |
+
+          上游发布时间：${PUBLISHED_AT}
+          EOF
+
+          gh release create "$RELEASE_TAG" \
+            --title "Codex Desktop ${UPSTREAM_VERSION}" \
+            --notes-file "$notes_file" \
+            /tmp/codex-desktop/codex-aarch64-apple-darwin.dmg \
+            /tmp/codex-desktop/codex-x86_64-apple-darwin.dmg \
+            /tmp/codex-desktop/codex-x86_64-pc-windows-msvc.exe \
+            /tmp/codex-desktop/codex-aarch64-pc-windows-msvc.exe
+
+      - name: Update desktop manifest
+        if: steps.upstream.outputs.skip != 'true'
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.upstream_tag }}
+          UPSTREAM_VERSION: ${{ steps.upstream.outputs.upstream_version }}
+          RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
+          PUBLISHED_AT: ${{ steps.upstream.outputs.published_at }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          release_url="https://github.com/${REPO}/releases/tag/${RELEASE_TAG}"
+          jq -n \
+            --arg upstream_tag "$UPSTREAM_TAG" \
+            --arg version "$UPSTREAM_VERSION" \
+            --arg release_tag "$RELEASE_TAG" \
+            --arg release_url "$release_url" \
+            --arg published_at "$PUBLISHED_AT" \
+            --arg synced_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --arg repo "$REPO" \
+            '{
+              product: "codex-desktop",
+              upstream_repo: "openai/codex",
+              upstream_tag: $upstream_tag,
+              version: $version,
+              release_tag: $release_tag,
+              release_url: $release_url,
+              upstream_published_at: $published_at,
+              synced_at: $synced_at,
+              offline_installer: true,
+              assets: [
+                {
+                  platform: "macOS (Apple Silicon)",
+                  file: "codex-aarch64-apple-darwin.dmg",
+                  url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/codex-aarch64-apple-darwin.dmg")
+                },
+                {
+                  platform: "macOS (Intel)",
+                  file: "codex-x86_64-apple-darwin.dmg",
+                  url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/codex-x86_64-apple-darwin.dmg")
+                },
+                {
+                  platform: "Windows (x64)",
+                  file: "codex-x86_64-pc-windows-msvc.exe",
+                  url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/codex-x86_64-pc-windows-msvc.exe")
+                },
+                {
+                  platform: "Windows (ARM64)",
+                  file: "codex-aarch64-pc-windows-msvc.exe",
+                  url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/codex-aarch64-pc-windows-msvc.exe")
+                }
+              ]
+            }' > downloads/codex/desktop.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/codex/desktop.json
+          git commit -m "chore: sync Codex Desktop manifest for ${UPSTREAM_TAG}"
+          git push
