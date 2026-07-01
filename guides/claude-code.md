@@ -339,6 +339,7 @@ Apply locally 重启后若又回到官方登录页：
 | 对话 | 正常回复 | 可能提示需 Pro |
 
 仍不确定时，macOS 可查看 `~/Library/Logs/Claude/main.log`，3P 启动后应有 `inference apiHost=https://taas.hk` 或 `provider: 'gateway'` 类日志。
+<img width="1512" height="949" alt="image" src="https://github.com/user-attachments/assets/26f6188a-f3f8-4d0e-bec8-8e860200f0fe" />
 
 ### 模型说明
 
