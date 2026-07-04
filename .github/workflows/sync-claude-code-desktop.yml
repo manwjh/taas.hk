@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Resolve upstream release
         id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
@@ -33,7 +35,6 @@ jobs:
             "win32/arm64|Windows (ARM64)"
           )
 
-          version=""
           assets_json="[]"
 
           for entry in "${platforms[@]}"; do
@@ -44,22 +45,18 @@ jobs:
             filename="$(echo "$meta" | jq -r '.filename')"
             url="$(echo "$meta" | jq -r '.url')"
 
-            if [ -z "$version" ]; then
-              version="$item_version"
-            elif [ "$version" != "$item_version" ]; then
-              echo "Version mismatch for ${path}: expected ${version}, got ${item_version}" >&2
-              exit 1
-            fi
-
             assets_json="$(echo "$assets_json" | jq \
               --arg platform "$label" \
               --arg path "$path" \
+              --arg version "$item_version" \
               --arg file "$filename" \
               --arg url "$url" \
-              '. + [{platform: $platform, path: $path, file: $file, url: $url}]')"
+              '. + [{platform: $platform, path: $path, version: $version, file: $file, url: $url}]')"
           done
 
-          release_tag="claude-code-desktop-v${version}"
+          version="$(echo "$assets_json" | jq -r '[.[].version] | unique | sort | join(" / ")')"
+          release_suffix="$(echo "$assets_json" | jq -r '[.[] | (.path | gsub("/"; "-")) + "-" + .version] | sort | join("_")')"
+          release_tag="claude-code-desktop-${release_suffix}"
 
           jq -n \
             --arg version "$version" \
@@ -110,22 +107,19 @@ jobs:
           set -euo pipefail
 
           notes_file="/tmp/claude-code-desktop/release-notes.md"
-          cat > "$notes_file" <<EOF
-          Claude Desktop（含 **Code** 标签页）离线安装包镜像。
-
-          来源：[Anthropic 官方离线发布通道](https://downloads.claude.ai/releases-offline/)（版本 ${VERSION}）。
-
-          均为完整离线安装包，安装时**无需再联网下载组件**。
-
-          | 平台 | 文件 |
-          |------|------|
-          | macOS · Apple Silicon | \`Claude-offline-darwin-arm64-${VERSION}.dmg\` |
-          | macOS · Intel | \`Claude-offline-darwin-x64-${VERSION}.dmg\` |
-          | Windows · x64 | \`Claude-offline-win32-x64-${VERSION}.msix\` |
-          | Windows · ARM64 | \`Claude-offline-win32-arm64-${VERSION}.msix\` |
-
-          > Windows 官方离线包为 \`.msix\` 格式（支持 Cowork / Code 完整功能）。详见 [Claude Desktop 安装文档](https://claude.com/docs/third-party/claude-desktop/installation)。
-          EOF
+          {
+            echo "Claude Desktop（含 **Code** 标签页）离线安装包镜像。"
+            echo
+            echo "来源：[Anthropic 官方离线发布通道](https://downloads.claude.ai/releases-offline/)（版本 ${VERSION}）。"
+            echo
+            echo "均为完整离线安装包，安装时**无需再联网下载组件**。"
+            echo
+            echo "| 平台 | 版本 | 文件 |"
+            echo "|------|------|------|"
+            jq -r '.assets[] | "| \(.platform) | `\(.version)` | `\(.file)` |"' /tmp/claude-upstream.json
+            echo
+            echo "> Windows 官方离线包为 \`.msix\` 格式（支持 Cowork / Code 完整功能）。详见 [Claude Desktop 安装文档](https://claude.com/docs/third-party/claude-desktop/installation)。"
+          } > "$notes_file"
 
           mapfile -t files < <(jq -r '.assets[].file' /tmp/claude-upstream.json | sed 's#^#/tmp/claude-code-desktop/#')
 
@@ -158,6 +152,8 @@ jobs:
                   .assets[]
                   | {
                       platform: .platform,
+                      path: .path,
+                      version: .version,
                       file: .file,
                       upstream_url: .url,
                       url: ("https://github.com/" + $repo + "/releases/download/" + $release_tag + "/" + .file)
