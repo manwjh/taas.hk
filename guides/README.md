@@ -31,7 +31,8 @@
 
 | Agent | Base URL | 协议 | 备注 |
 |-------|----------|------|------|
-| **Codex** | `https://taas.hk/v1` | Responses | `wire_api = "responses"` |
+| **ChatGPT App**（原 Codex Desktop） | `https://taas.hk/v1` | Responses | 见 [chatgpt.md](./chatgpt.md) |
+| **Codex CLI / IDE** | `https://taas.hk/v1` | Responses | `wire_api = "responses"` |
 | **Claude Desktop（3P）** | `https://taas.hk` | Messages | 根域，**不带** `/v1` |
 | **Claude Desktop + GPT 映射** | `https://taas.hk` | Messages + 本地路由 | 须 CC Switch 模型映射 |
 
@@ -41,7 +42,8 @@
 
 | 文档 | 内容 |
 |------|------|
-| [codex.md](./codex.md) | Codex 官方配置、直接配置、CC Switch 参数 |
+| [chatgpt.md](./chatgpt.md) | **ChatGPT App**（原 Codex Desktop）接入 taas.hk 完整流程 |
+| [codex.md](./codex.md) | Codex CLI / IDE 扩展、CC Switch 参数 |
 | [claude-code.md](./claude-code.md) | Claude Code CLI / Desktop 手动配置 |
 | [cc-switch.md](./cc-switch.md) | CC Switch 槽位参数与切换说明 |
 | [opencode.md](./opencode.md) | OpenCode Provider 配置 |

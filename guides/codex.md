@@ -1,6 +1,8 @@
 # Codex 使用指南
 
-[Codex](https://openai.com/codex) 是 OpenAI **厂商 Agent**。本文说明官方配置，以及经 taas.hk 网关接入的两种方式：**直接改配置文件**，或通过 **[CC Switch](./cc-switch.md)** 图形化管理。
+[Codex](https://openai.com/codex) 是 OpenAI **厂商 Agent**。本文说明 **CLI / IDE 扩展** 的官方配置，以及经 taas.hk 网关接入的两种方式：**直接改配置文件**，或通过 **[CC Switch](./cc-switch.md)** 图形化管理。
+
+> **桌面应用**：OpenAI 已将独立 Codex App 并入 **ChatGPT App**。macOS / Windows 桌面端请阅 **[chatgpt.md](./chatgpt.md)**（配置目录仍为 `~/.codex`，但登录与排错流程不同）。
 
 **前置**：已在 taas.hk 创建令牌，见 [README · 创建令牌](../README.md#创建令牌)。
 

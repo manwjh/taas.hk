@@ -32,11 +32,12 @@
 
 | Agent | 协议 | 要点 |
 |-------|------|------|
-| **Codex** | [Responses](https://developers.openai.com/codex/config-advanced#custom-model-providers) | `model_provider` + `wire_api = "responses"` |
+| **ChatGPT App**（原 Codex Desktop） | [Responses](https://learn.chatgpt.com/docs/config-file/config-advanced#custom-model-providers) | 见 [chatgpt.md](./guides/chatgpt.md) |
+| **Codex CLI / IDE** | [Responses](https://developers.openai.com/codex/config-advanced#custom-model-providers) | `model_provider` + `wire_api = "responses"` |
 | **Claude Code（CLI）** | [Messages](https://code.claude.com/docs/en/llm-gateway) | `ANTHROPIC_BASE_URL` 根域，不带 `/v1` |
 | **Claude Desktop** | Messages | [Cowork on 3P](https://claude.com/docs/cowork/3p/overview) + Gateway |
 
-操作步骤：[guides 典型场景](./guides/README.md) · [codex.md §2 直接配置 / §3 CC Switch](./guides/codex.md#2-taashk-网关接入--直接配置) · [claude-code.md](./guides/claude-code.md)
+操作步骤：[guides 典型场景](./guides/README.md) · [chatgpt.md](./guides/chatgpt.md)（桌面 App）· [codex.md §2](./guides/codex.md#2-taashk-网关接入--直接配置)（CLI）· [claude-code.md](./guides/claude-code.md)
 
 ---
 
@@ -75,7 +76,8 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 | Agent | API 地址 | 备注 |
 |-------|----------|------|
-| Codex | `https://taas.hk/v1` | `wire_api = "responses"` |
+| ChatGPT App | `https://taas.hk/v1` | 见 [chatgpt.md](./guides/chatgpt.md) |
+| Codex CLI / IDE | `https://taas.hk/v1` | `wire_api = "responses"` |
 | Claude Code（CLI） | `https://taas.hk` | 不带 `/v1` |
 | Claude Desktop | `https://taas.hk` | 3P；GPT 模型另需 CC Switch 映射 |
 | OpenCode | `https://taas.hk/v1` | `@ai-sdk/openai-compatible` |
@@ -114,7 +116,8 @@ curl -X POST https://taas.hk/v1/chat/completions \
 
 | 文档 | 内容 |
 |------|------|
-| [codex.md](./guides/codex.md) | Codex 直接配置与 CC Switch 配置 |
+| [chatgpt.md](./guides/chatgpt.md) | ChatGPT App（原 Codex Desktop）接入 taas.hk |
+| [codex.md](./guides/codex.md) | Codex CLI / IDE 与 CC Switch 配置 |
 | [claude-code.md](./guides/claude-code.md) | Claude Code 手动配置 |
 | [opencode.md](./guides/opencode.md) | OpenCode 手动配置 |
 | [cc-switch.md](./guides/cc-switch.md) | CC Switch 统一配置 |

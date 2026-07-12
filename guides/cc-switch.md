@@ -32,11 +32,11 @@
 
 ## taas.hk 槽位参数
 
-### Codex
+### Codex（ChatGPT App）
 
-Base URL `https://taas.hk/v1`，Wire API `responses`，模型 `gpt-5.5`。切换后完全退出 Codex（`Cmd+Q`）再打开。
+CC Switch 的 **Codex** 槽位写入 `~/.codex/config.toml`，供 **ChatGPT App**（原 Codex Desktop）使用。完整流程见 [chatgpt.md §4](./chatgpt.md#4-taashk-网关接入--cc-switch)。
 
-操作步骤见 [codex.md §3](./codex.md#3-taashk-网关接入--cc-switch)。
+Base URL `https://taas.hk/v1`，Wire API `responses`，模型 `gpt-5.5`。切换后完全退出 ChatGPT App（`Cmd+Q`）再打开。
 
 ### Claude Code（CLI）
 
