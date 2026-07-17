@@ -1,43 +1,43 @@
 {
   "product": "claude-code-desktop",
   "upstream_base": "https://downloads.claude.ai/releases-offline",
-  "version": "1.21459.3",
-  "release_tag": "claude-code-desktop-darwin-arm64-1.21459.3_darwin-x64-1.21459.3_win32-arm64-1.21459.3_win32-x64-1.21459.3",
-  "synced_at": "2026-07-16T09:16:32Z",
+  "version": "1.22209.0",
+  "release_tag": "claude-code-desktop-darwin-arm64-1.22209.0_darwin-x64-1.22209.0_win32-arm64-1.22209.0_win32-x64-1.22209.0",
+  "synced_at": "2026-07-17T09:13:34Z",
   "offline_installer": true,
   "assets": [
     {
       "platform": "macOS (Apple Silicon)",
       "path": "darwin/arm64",
-      "version": "1.21459.3",
-      "file": "Claude-offline-darwin-arm64-1.21459.3.dmg",
-      "upstream_url": "https://downloads.claude.ai/releases-offline/darwin/arm64/1.21459.3/Claude-e0f338aea51a130071b62788fee794575c1b9d0e-offline.dmg",
-      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.21459.3_darwin-x64-1.21459.3_win32-arm64-1.21459.3_win32-x64-1.21459.3/Claude-offline-darwin-arm64-1.21459.3.dmg"
+      "version": "1.22209.0",
+      "file": "Claude-offline-darwin-arm64-1.22209.0.dmg",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/darwin/arm64/1.22209.0/Claude-77c938bac27689d6df971289c10759e512785c73-offline.dmg",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.22209.0_darwin-x64-1.22209.0_win32-arm64-1.22209.0_win32-x64-1.22209.0/Claude-offline-darwin-arm64-1.22209.0.dmg"
     },
     {
       "platform": "macOS (Intel)",
       "path": "darwin/x64",
-      "version": "1.21459.3",
-      "file": "Claude-offline-darwin-x64-1.21459.3.dmg",
-      "upstream_url": "https://downloads.claude.ai/releases-offline/darwin/x64/1.21459.3/Claude-e0f338aea51a130071b62788fee794575c1b9d0e-offline.dmg",
-      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.21459.3_darwin-x64-1.21459.3_win32-arm64-1.21459.3_win32-x64-1.21459.3/Claude-offline-darwin-x64-1.21459.3.dmg"
+      "version": "1.22209.0",
+      "file": "Claude-offline-darwin-x64-1.22209.0.dmg",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/darwin/x64/1.22209.0/Claude-77c938bac27689d6df971289c10759e512785c73-offline.dmg",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.22209.0_darwin-x64-1.22209.0_win32-arm64-1.22209.0_win32-x64-1.22209.0/Claude-offline-darwin-x64-1.22209.0.dmg"
     },
     {
       "platform": "Windows (x64)",
       "path": "win32/x64",
-      "version": "1.21459.3",
-      "file": "Claude-offline-win32-x64-1.21459.3.msix",
-      "upstream_url": "https://downloads.claude.ai/releases-offline/win32/x64/1.21459.3/Claude-e0f338aea51a130071b62788fee794575c1b9d0e-offline.msix",
-      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.21459.3_darwin-x64-1.21459.3_win32-arm64-1.21459.3_win32-x64-1.21459.3/Claude-offline-win32-x64-1.21459.3.msix"
+      "version": "1.22209.0",
+      "file": "Claude-offline-win32-x64-1.22209.0.msix",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/win32/x64/1.22209.0/Claude-77c938bac27689d6df971289c10759e512785c73-offline.msix",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.22209.0_darwin-x64-1.22209.0_win32-arm64-1.22209.0_win32-x64-1.22209.0/Claude-offline-win32-x64-1.22209.0.msix"
     },
     {
       "platform": "Windows (ARM64)",
       "path": "win32/arm64",
-      "version": "1.21459.3",
-      "file": "Claude-offline-win32-arm64-1.21459.3.msix",
-      "upstream_url": "https://downloads.claude.ai/releases-offline/win32/arm64/1.21459.3/Claude-e0f338aea51a130071b62788fee794575c1b9d0e-offline.msix",
-      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.21459.3_darwin-x64-1.21459.3_win32-arm64-1.21459.3_win32-x64-1.21459.3/Claude-offline-win32-arm64-1.21459.3.msix"
+      "version": "1.22209.0",
+      "file": "Claude-offline-win32-arm64-1.22209.0.msix",
+      "upstream_url": "https://downloads.claude.ai/releases-offline/win32/arm64/1.22209.0/Claude-77c938bac27689d6df971289c10759e512785c73-offline.msix",
+      "url": "https://github.com/manwjh/taas.hk/releases/download/claude-code-desktop-darwin-arm64-1.22209.0_darwin-x64-1.22209.0_win32-arm64-1.22209.0_win32-x64-1.22209.0/Claude-offline-win32-arm64-1.22209.0.msix"
     }
   ],
-  "release_url": "https://github.com/manwjh/taas.hk/releases/tag/claude-code-desktop-darwin-arm64-1.21459.3_darwin-x64-1.21459.3_win32-arm64-1.21459.3_win32-x64-1.21459.3"
+  "release_url": "https://github.com/manwjh/taas.hk/releases/tag/claude-code-desktop-darwin-arm64-1.22209.0_darwin-x64-1.22209.0_win32-arm64-1.22209.0_win32-x64-1.22209.0"
 }
